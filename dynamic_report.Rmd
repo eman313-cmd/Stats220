@@ -1,0 +1,75 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+
+
+```
+
+## What's going on with this data?
+
+You need to change the contents of this Rmd! Replace the R code and markdown give below in this template document.
+
+During my observations, I recorded separate observations of blue cars that were on the road when I was travelling in my car aswell. Below is the data I found out about my observations. 
+```{r}
+library(tidyverse)
+#reading csv data 
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQFRCJM7Fwjtl4uehhwqLm2pf5i0mlFnStUxqGegS_VKMIa4N67lkCP0jS0NufxkLFSHOoeWLFWIgXm/pub?output=csv")
+
+#renaming values 
+    latest_data <- logged_data %>%
+    rename(
+    timestamp = Timestamp,
+    time_of_day = `time of day`,
+    total_blue_cars = `how many blue cars seen`,
+    light_blue = `light blue`,
+    medium_blue = medium,
+    dark_blue = Dark
+  )
+#mean, median, min and max of blue cars seen in my data 
+mean(latest_data$total_blue_cars) 
+median(latest_data$total_blue_cars) 
+min(latest_data$total_blue_cars) 
+max(latest_data$total_blue_cars)
+
+#plot number one (observations by time of day)
+    ggplot(latest_data, aes(x = time_of_day)) +
+    geom_bar() +
+    labs(
+    title = "Observations by Time of Day",
+    x = "Time of Day",
+    y = "Number of Observations"
+  )
+#adjusting variables for plot 2
+    blue_shades <- latest_data %>%
+    select(light_blue, medium_blue, dark_blue) %>%
+    pivot_longer(
+    cols = everything(),
+    names_to = "shade",
+    values_to = "count"
+ )
+#plot number 2
+    ggplot(blue_shades, aes(x = shade, y = count)) +
+    geom_bar(stat = "identity") +
+    labs(
+    title = "Number of Blue Cars by Shade",
+    x = "Shade of Blue",
+    y = "Count"
+  )
+
+```
+On average, I saw`r round(mean(latest_data$total_blue_cars),2)` per trip I was in the car for, we can find this by using the mean of my data observations, However, the median amount of blue cars that would be seen per observation according to my data is `r round(median(latest_data$total_blue_cars),2)`. The most amount of blue cars I saw in one observation period (car trip) was `r round(max(latest_data$total_blue_cars),2)` and the least seen was `r round(min(latest_data$total_blue_cars),2)` , this shows how varied the data actually is. Seem I am taking the latest data from my csv as more responses come in these numbers would change as it automatically updates. 
+
+The bar charts above can show us even more information about my data then what the max,min, median and mean can. 
+My first graph is observing the number of blue cars seen by the time of day, we can see that according to my data the most bluecars seen were in the mornings however this could be due to having more morning observations then the other times of day. We can also see that the least amount of blue cars seen was at midday. 
+My second graph shows the amount of blue cars seen by shade of blue, as this was another category I took note of in my observation survey. As the graph shows, there was more medium blue cars then there are dark or light blue, this could be because it is harder to categories what is classed a dark or light blue car, so majority of blue cars could fall into the medium blue category. 
+
+
+
