@@ -1,75 +1,59 @@
 ---
-title: My dynamic report
-output: html_fragment
+title: Blue car observation
+output: html_document
 ---
+
+```{=html}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+```
 
+```{js}
+$(function() {
+  $(".level2").css('visibility', 'hidden');
+  $(".level2").first().css('visibility', 'visible');
+  $(".container-fluid").height($(".container-fluid").height() + 300);
+  $(window).on('scroll', function() {
+    $('h2').each(function() {
+      var h2Top = $(this).offset().top - $(window).scrollTop();
+      var windowHeight = $(window).height();
+      if (h2Top >= 0 && h2Top <= windowHeight / 2) {
+        $(this).parent('div').css('visibility', 'visible');
+      } else if (h2Top > windowHeight / 2) {
+        $(this).parent('div').css('visibility', 'hidden');
+      }
+    });
+  });
+})
 ```
 
 ```{css}
-
-
+.figcaption {display: none}
+body{
+  background-colour: #fde0dd;
+    colour: #4a004a;
+    font-family: Arial, sans-serif;
+}
+h1, h2 {
+  colour: #c51b8a;
+}
 ```
 
-## What's going on with this data?
+## visual data story
 
-You need to change the contents of this Rmd! Replace the R code and markdown give below in this template document.
+## Comparing light blue cars with total blue cars
 
-During my observations, I recorded separate observations of blue cars that were on the road when I was travelling in my car aswell. Below is the data I found out about my observations. 
-```{r}
-library(tidyverse)
-#reading csv data 
-logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQFRCJM7Fwjtl4uehhwqLm2pf5i0mlFnStUxqGegS_VKMIa4N67lkCP0jS0NufxkLFSHOoeWLFWIgXm/pub?output=csv")
+![scatterplot relation ship between light blue cars and total blue cars]("plot2.png") plot2 shows that when the amount of cars seen increases so does the number of light blue cars seen. When total blue cars are between 5 and 15 the amount of light blue cars sits around 1-3.
 
-#renaming values 
-    latest_data <- logged_data %>%
-    rename(
-    timestamp = Timestamp,
-    time_of_day = `time of day`,
-    total_blue_cars = `how many blue cars seen`,
-    light_blue = `light blue`,
-    medium_blue = medium,
-    dark_blue = Dark
-  )
-#mean, median, min and max of blue cars seen in my data 
-mean(latest_data$total_blue_cars) 
-median(latest_data$total_blue_cars) 
-min(latest_data$total_blue_cars) 
-max(latest_data$total_blue_cars)
+## comparing time of day and total blue cars
 
-#plot number one (observations by time of day)
-    ggplot(latest_data, aes(x = time_of_day)) +
-    geom_bar() +
-    labs(
-    title = "Observations by Time of Day",
-    x = "Time of Day",
-    y = "Number of Observations"
-  )
-#adjusting variables for plot 2
-    blue_shades <- latest_data %>%
-    select(light_blue, medium_blue, dark_blue) %>%
-    pivot_longer(
-    cols = everything(),
-    names_to = "shade",
-    values_to = "count"
- )
-#plot number 2
-    ggplot(blue_shades, aes(x = shade, y = count)) +
-    geom_bar(stat = "identity") +
-    labs(
-    title = "Number of Blue Cars by Shade",
-    x = "Shade of Blue",
-    y = "Count"
-  )
+![Bar chart of time of day and total blue cars seen comparing them]("plot1.png") the average of blue cars seen seems to be the most in the afternoon and evening, mornings have the least amount of blue car seen.
 
-```
-On average, I saw`r round(mean(latest_data$total_blue_cars),2)` per trip I was in the car for, we can find this by using the mean of my data observations, However, the median amount of blue cars that would be seen per observation according to my data is `r round(median(latest_data$total_blue_cars),2)`. The most amount of blue cars I saw in one observation period (car trip) was `r round(max(latest_data$total_blue_cars),2)` and the least seen was `r round(min(latest_data$total_blue_cars),2)` , this shows how varied the data actually is. Seem I am taking the latest data from my csv as more responses come in these numbers would change as it automatically updates. 
+## patterns throughout the day
 
-The bar charts above can show us even more information about my data then what the max,min, median and mean can. 
-My first graph is observing the number of blue cars seen by the time of day, we can see that according to my data the most bluecars seen were in the mornings however this could be due to having more morning observations then the other times of day. We can also see that the least amount of blue cars seen was at midday. 
-My second graph shows the amount of blue cars seen by shade of blue, as this was another category I took note of in my observation survey. As the graph shows, there was more medium blue cars then there are dark or light blue, this could be because it is harder to categories what is classed a dark or light blue car, so majority of blue cars could fall into the medium blue category. 
-
+![line graph of average blue cars seen per day]("plot3.png") from this plot we can see my data has a huge gap which would have been when we wernt doing project 2 or 4, the most cars seen in total in one day was over 75.
 
 
