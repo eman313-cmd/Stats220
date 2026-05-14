@@ -31,6 +31,8 @@ $(function() {
 ```
 
 ```{css}
+library(tidyverse)
+
 .figcaption {display: none}
 body{
   background-colour: #fde0dd;
@@ -41,19 +43,128 @@ h1, h2 {
   colour: #c51b8a;
 }
 ```
+```{r}
+library(tidyverse)
+logged_data <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQFRCJM7Fwjtl4uehhwqLm2pf5i0mlFnStUxqGegS_VKMIa4N67lkCP0jS0NufxkLFSHOoeWLFWIgXm/pub?output=csv")
+theme_colours <- c(
+  "#fde0dd",
+  "#fa9fb5",
+  "#c51b8a",
+  "#FF00FF"
+)
 
+logged_data <- logged_data %>%
+  mutate(
+    Timestamp = dmy_hms(Timestamp),
+    day = date(Timestamp),
+    hour = hour(Timestamp),
+    prop_light_blue =
+      light.blue / how.many.blue.cars.seen,
+    time_label =
+      str_to_title(time.of.day)
+  ) %>%
+  
+  mutate(
+    prop_light_blue =
+    case_when(
+    is.infinite(prop_light_blue) ~ NA_real_,
+    TRUE ~ prop_light_blue
+      )
+  )
+summary_data <- logged_data %>%
+  group_by(time_label) %>%
+  summarise(
+  mean_blue =
+  mean(how.many.blue.cars.seen,
+  na.rm = TRUE),
+  mean_light = 
+  mean(light.blue,
+  na.rm = TRUE),
+  observations = n()
+  ) %>%
+  arrange(desc(mean_blue))
+  Daily_data <- logged_data %>%
+    group_by(day)%>% 
+    summarise(
+      total_blue = 
+        sum(how.many.blue.cars.seen,
+            na.rm = TRUE),
+      total_light =
+        sum(light.blue, 
+            na.rm = TRUE)
+    ) %>%
+    arrange(day)
+
+```
 ## visual data story
 
 ## Comparing light blue cars with total blue cars
 
-![scatterplot relation ship between light blue cars and total blue cars]("plot2.png") plot2 shows that when the amount of cars seen increases so does the number of light blue cars seen. When total blue cars are between 5 and 15 the amount of light blue cars sits around 1-3.
+```{r}
+library(tidyverse)
+
+ggplot(logged_data,
+         aes(x= how.many.blue.cars.seen,
+             y=light.blue,
+             colour = time_label))+
+    geom_point(size=3)
+  labs(
+    title = "relationship between total blue carsand light blue cars",
+    subtitle = "1 point = 1 observation",
+    x= "total blue cars seen",
+    y="light blue cars seen",
+    colour= "time of day",
+    caption = "scatterplot of logged observations"
+  )+
+    scale_colour_manual(values = theme_colours)+
+    theme_minimal()
+
+```
+plot2 shows that when the amount of cars seen increases so does the number of light blue cars seen. When total blue cars are between 5 and 15 the amount of light blue cars sits around 1-3.
 
 ## comparing time of day and total blue cars
 
-![Bar chart of time of day and total blue cars seen comparing them]("plot1.png") the average of blue cars seen seems to be the most in the afternoon and evening, mornings have the least amount of blue car seen.
+```{r}
+library(tidyverse)
+
+ggplot(summary_data,
+         aes(x=time_label,
+             y=mean_blue,
+             fill = time_label))+
+    geom_col()+
+    labs(
+      title =  "average number of blue cars seen",
+      subtitle = "comparison across times of day",
+      x="time of day",
+      y="average blue cars seen",
+      caption="source:logged observations"
+    ) +
+    scale_fill_manual(values = theme_colours)+
+    theme_minimal()+
+    theme(legend.position = "none")
+
+```
+the average of blue cars seen seems to be the most in the afternoon and evening, mornings have the least amount of blue car seen.
 
 ## patterns throughout the day
 
-![line graph of average blue cars seen per day]("plot3.png") from this plot we can see my data has a huge gap which would have been when we wernt doing project 2 or 4, the most cars seen in total in one day was over 75.
+```{r}
+library(tidyverse)
 
+ggplot(Daily_data,
+         aes(x= day,
+             y= total_blue))+
+    geom_line(colour="#fde0dd",
+              linewidth = 1.2)+
+    geom_point(colour="#c51b8a",
+               size=3)+
+    labs(
+      title = "total blue cars observed over time",
+      subtitle = "daily total based on timestamps",
+      x="date",
+      y="total blue cars seen"
+    )+
+    theme_classic()
+``` 
+from this plot we can see my data has a huge gap which would have been when we wernt doing project 2 or 4, the most cars seen in total in one day was over 75.
 
